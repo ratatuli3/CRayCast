@@ -58,7 +58,7 @@ build CMakeFiles/CRayCast.dir/main.c.o: C_COMPILER__CRayCast_ /home/ratatuli/Doc
 # Link the executable CRayCast
 
 build CRayCast: C_EXECUTABLE_LINKER__CRayCast_ CMakeFiles/CRayCast.dir/main.c.o | /usr/lib/x86_64-linux-gnu/libGL.so /usr/lib/x86_64-linux-gnu/libglut.so /usr/lib/x86_64-linux-gnu/libGLU.so /usr/lib/x86_64-linux-gnu/libXi.so
-  LINK_LIBRARIES = /usr/lib/x86_64-linux-gnu/libGL.so  /usr/lib/x86_64-linux-gnu/libglut.so  /usr/lib/x86_64-linux-gnu/libGLU.so  /usr/lib/x86_64-linux-gnu/libXi.so
+  LINK_LIBRARIES = /usr/lib/x86_64-linux-gnu/libGL.so  /usr/lib/x86_64-linux-gnu/libglut.so  /usr/lib/x86_64-linux-gnu/libGLU.so  -lm  /usr/lib/x86_64-linux-gnu/libXi.so
   OBJECT_DIR = CMakeFiles/CRayCast.dir
   POST_BUILD = :
   PRE_LINK = :

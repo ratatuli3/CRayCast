@@ -13,4 +13,4 @@ find_package(GLUT REQUIRED)
 find_library(GLU_LIBRARY NAMES GLU libGLU)
 
 # Link OpenGL and GLUT to your project
-target_link_libraries(${PROJECT_NAME} OpenGL::GL GLUT::GLUT ${GLU_LIBRARY})
+target_link_libraries(${PROJECT_NAME} OpenGL::GL GLUT::GLUT ${GLU_LIBRARY} m)
