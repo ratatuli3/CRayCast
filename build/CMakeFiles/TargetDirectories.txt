@@ -1,0 +1,3 @@
+/home/ratatuli/Documents/CodingFolder/CProjects/CRayCast/build/CMakeFiles/CRayCast.dir
+/home/ratatuli/Documents/CodingFolder/CProjects/CRayCast/build/CMakeFiles/edit_cache.dir
+/home/ratatuli/Documents/CodingFolder/CProjects/CRayCast/build/CMakeFiles/rebuild_cache.dir
