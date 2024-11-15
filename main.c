@@ -17,7 +17,7 @@ void drawPlayer(){
 	glLineWidth(3);
 	glBegin(GL_LINES);
 	glVertex2i(px,py);
-	glVertex2i(px+pdx*5,py+pdy*5);
+	glVertex2i(px+pdx*7,py+pdy*7); // The 7 is the length added to the line
 	glEnd();
 }
 
@@ -25,9 +25,9 @@ int mapX=8, mapY=8, mapS=64;
 int map[]=
 {
 1,1,1,1,1,1,1,1,
-1,0,1,0,0,1,0,1,
-1,0,1,0,0,1,0,1,
-1,0,1,0,0,1,0,1,
+1,0,1,0,0,0,1,1,
+1,0,1,0,0,0,0,1,
+1,0,1,0,0,0,0,1,
 1,0,0,0,0,0,0,1,
 1,0,0,0,0,1,0,1,
 1,0,0,0,0,0,0,1,
@@ -52,6 +52,24 @@ void drawMap2D(){
 			// The +1 and -1 are basically pushing the box one pixel inward and thats how we have that grid effect
 			glEnd(); // End Drawing
 		}
+	}
+}
+
+void drawRays3D(){
+	int r,mx,my,mp,dof; float rx,ry,ra,xo,yo;
+	ra=pa;
+	for(r=0;r<1;r++){ // How many rays we want to cast?
+		// Check horizontal lines
+		dof=0;
+		float aTan=-1/tan(ra); // This tells you how much distance is traveled horizontally when we shift our vision vertically
+		if(ra>PI){ // Looking up cause angle in rad is more than PI first two quadrants
+			ry=(((int)py>>6)<<6)-0.0001; rx=(py-ry) * aTan+px; // >>1 is equal to /2, so you can derive >>6 to be divided 2^6 = 64 and doing <<6 which is multiplying it back with 64
+			yo=-64; xo=-yo*aTan; // Basically just offsetting it by 64 since its the second line it finds
+		} // ry is reaching the position of the nearest multiple of 64 with that calculation which is the closest horizontal line and rx will be the x position that the end of the line would be proportional to the y position it is when touching the nearest square
+		if(ra<PI){ // If looking down
+			ry=(((int)py>>6)<<6)+64; rx=(py-ry) * aTan+px; yo=64; xo=-yo*aTan;
+		}
+		if(ra==0 || ra==PI) { rx=px; ry=py; dof=8; } // Looking straight left or right doesn't touch any horizontal lines.
 	}
 }
 
