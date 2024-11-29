@@ -6,6 +6,10 @@
 #include <GL/glut.h>
 #include <math.h>
 
+typedef struct{
+ int w,a,s,d; // Button state
+}ButtonKeys; ButtonKeys Keys;
+
 //-----------------------------MAP----------------------------------------------
 #define mapX  8      //map width
 #define mapY  8      //map height
@@ -43,8 +47,8 @@ void drawMap2D()
 
 
 //------------------------PLAYER------------------------------------------------
-float degToRad(int a) { return a*M_PI/180.0;}
-int FixAng(int a){ if(a>359){ a-=360;} if(a<0){ a+=360;} return a;}
+float degToRad(float a) { return a*M_PI/180.0;}
+float FixAng(float a){ if(a>359){ a-=360;} if(a<0){ a+=360;} return a;}
 
 float px,py,pdx,pdy,pa;
 
@@ -54,19 +58,11 @@ void drawPlayer2D()
  glBegin(GL_POINTS); glVertex2i(px,py); glEnd();
  glBegin(GL_LINES);  glVertex2i(px,py); glVertex2i(px+pdx*20,py+pdy*20); glEnd();
 }
-
-void Buttons(unsigned char key,int x,int y)
-{
- if(key=='a'){ pa+=5; pa=FixAng(pa); pdx=cos(degToRad(pa)); pdy=-sin(degToRad(pa));} 	
- if(key=='d'){ pa-=5; pa=FixAng(pa); pdx=cos(degToRad(pa)); pdy=-sin(degToRad(pa));} 
- if(key=='w'){ px+=pdx*5; py+=pdy*5;}
- if(key=='s'){ px-=pdx*5; py-=pdy*5;}
- glutPostRedisplay();
-}//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 
 //---------------------------Draw Rays and Walls--------------------------------
-float distance(ax,ay,bx,by,ang){ return cos(degToRad(ang))*(bx-ax)-sin(degToRad(ang))*(by-ay);}
+float distance(float ax,float ay,float bx,float by,float ang){ return cos(degToRad(ang))*(bx-ax)-sin(degToRad(ang))*(by-ay);}
 
 void drawRays2D()
 {
@@ -131,13 +127,61 @@ void init()
  pdx=cos(degToRad(pa)); pdy=-sin(degToRad(pa)); 
 }
 
+float frame1,frame2,fps;
+
 void display()
-{   
+{
+ // Frames per Second guess it just calculates it cause display happens every second.
+ frame2=glutGet(GLUT_ELAPSED_TIME); fps=(frame2-frame1); frame1=glutGet(GLUT_ELAPSED_TIME);
+
+
+ // Buttons
+ if(Keys.a==1){ pa+=0.2*fps; pa=FixAng(pa); pdx=cos(degToRad(pa)); pdy=-sin(degToRad(pa));} 	
+ if(Keys.d==1){ pa-=0.2*fps; pa=FixAng(pa); pdx=cos(degToRad(pa)); pdy=-sin(degToRad(pa));} 
+
+ int xo=0; if(pdx<0){ xo=-20; } else{ xo=20; } // If moving to the left make offset check left side else right
+ int yo=0; if(pdy<0){ yo=-20; } else{ yo=20; } // Same thing but with up or down
+ int ipx=px/64.0, ipx_add_xo=(px+xo)/64.0, ipx_sub_xo=(px-xo)/64.0;
+ int ipy=py/64.0, ipy_add_yo=(py+yo)/64.0, ipy_sub_yo=(py-yo)/64.0; // ipy check what square it is on the y axis
+
+ if(Keys.w==1){
+  if(map[ipy*mapX + ipx_add_xo]==0){ px+=pdx*0.2*fps; } // So, if the square that you're currently in + the offset that we put is in 0 then we can move.
+  if(map[ipy_add_yo*mapX + ipx]==0){ py+=pdy*0.2*fps; } // Same thing here I don't really get why this is the opposite though whatever.
+ }
+ if(Keys.s==1){
+  if(map[ipy*mapX + ipx_sub_xo]==0){ px-=pdx*0.2*fps; } // So, if the square that you're currently in + the offset that we put is in 0 then we can move.
+  if(map[ipy_sub_yo*mapX + ipx]==0){ py-=pdy*0.2*fps; } // Same thing here I don't really get why this is the opposite though whatever.
+ }
+ 
+ glutPostRedisplay();
+
  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
  drawMap2D();
  drawPlayer2D();
  drawRays2D();
- glutSwapBuffers();  
+ glutSwapBuffers();
+}
+
+void ButtonDown(unsigned char key,int x,int y)
+{
+ if(key=='a'){ Keys.a=1; }
+ if(key=='d'){ Keys.d=1; }
+ if(key=='w'){ Keys.w=1; }
+ if(key=='s'){ Keys.s=1; }
+ glutPostRedisplay();
+}
+
+void ButtonUp(unsigned char key,int x,int y)
+{
+ if(key=='a'){ Keys.a=0; }
+ if(key=='d'){ Keys.d=0; }
+ if(key=='w'){ Keys.w=0; }
+ if(key=='s'){ Keys.s=0; }
+ glutPostRedisplay();
+}
+
+void resize(int w, int h){
+ glutReshapeWindow(1024,512);
 }
 
 int main(int argc, char* argv[])
@@ -145,9 +189,12 @@ int main(int argc, char* argv[])
  glutInit(&argc, argv);
  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
  glutInitWindowSize(1024,510);
- glutCreateWindow("YouTube-3DSage");
+ glutInitWindowPosition(200,200);
+ glutCreateWindow("Game");
  init();
  glutDisplayFunc(display);
- glutKeyboardFunc(Buttons);
+ glutReshapeFunc(resize);
+ glutKeyboardFunc(ButtonDown);
+ glutKeyboardUpFunc(ButtonUp);
  glutMainLoop();
 }
